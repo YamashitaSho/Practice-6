@@ -158,12 +158,12 @@ int struct_load(user_t *p ,char *file){
 	int i = 0;
 	char buf[120];
 	char *buf_p;
+	FILE *fp;
 	
 	memset( buf , '\0' , 120 );					//buf[119]まで'\0'埋め
 	
 	input_a_line(file , MODE_LOAD);				//ファイル名をユーザーに要求する
 	
-	FILE *fp;
 	fp = fopen(file,"r");
 	if (fp == NULL){
 		printf("%s:ファイルが開けませんでした。\n", file);
@@ -178,21 +178,21 @@ int struct_load(user_t *p ,char *file){
 		if (buf[0] == '\0'){
 			break;
 		}
-		
+
 		buf_p = strtok( buf , "," );			//もし","がいなくても119バイトで止まる
 		if (buf_p != 0) {						//","が見つかっていた場合
 			strncpy( (p+i)->name , buf_p ,49);	//buf_pが示す値を49バイトまでコピー(50バイトまで初期化してある)
 		} else {								//見つからないならファイル形式エラー
 			return FILETYPE_ERROR;
 		}
-		
+
 		buf_p = strtok( NULL , "," );
 		if (buf_p != 0) {
 			strncpy( (p+i)->ruby , buf_p ,49);
 		} else {
 			return FILETYPE_ERROR;
 		}
-		
+
 		buf_p = strtok( NULL , "\n" );			//構造体の3つ目の区切り文字は改行コード
 		if (buf_p != 0){
 			strncpy( (p+i)->phone , buf_p ,19);
@@ -200,6 +200,9 @@ int struct_load(user_t *p ,char *file){
 			return FILETYPE_ERROR;
 		}
 		i++;
+		if ( i >= DATA_NUM ){
+			break;								//DATA＿NUM個受け取ったら終わり
+		}
 		memset( buf , '\0' , 120 );				//一周ごとに再度'\0'で埋める
 	}
 	
